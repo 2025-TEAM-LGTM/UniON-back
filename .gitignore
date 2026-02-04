@@ -1,4 +1,4 @@
-HELP.md
+demo/HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### application config
+/demo/src/main/resources/application.properties
+/demo/src/main/resources/application.yml

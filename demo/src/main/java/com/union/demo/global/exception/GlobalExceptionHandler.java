@@ -1,10 +1,9 @@
-package com.union.demo.exception;
+package com.union.demo.global.exception;
 
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
-
-
+//ErrorDto 이용해서 에러 만들면 될듯!
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     //1. validation 에러(dto 검증 실패)
@@ -13,8 +12,5 @@ public class GlobalExceptionHandler {
     //4. path, query 파라미터 타입 오류
     //5. db 제약 위반 처리
     //6. 알 수 없는 예외.
-
-    //++ 이외에도 필요한 에러 함수 있으면 추가하기
-
 
 }

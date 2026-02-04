@@ -1,27 +1,110 @@
 package com.union.demo.service;
+
+import com.union.demo.dto.request.SignupReqDto;
+import com.union.demo.entity.Profile;
+import com.union.demo.entity.Role;
+import com.union.demo.entity.Users;
+import com.union.demo.enums.JwtRole;
+import com.union.demo.repository.*;
+import com.union.demo.utill.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 //jwt 기준
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class AuthService {
-    //1. signup
-        //1-1 loginId/email/nickname 중복 체크
-        //1-2 비밀번호 해싱(BCrypt)
-        //1-3 User 저장 + 기본 Profile 생성(선택)
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RoleRepository roleRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final ProfileRepository profileRepository;
 
+    //signup 회원가입
+    @Transactional
+    public Users signUp(SignupReqDto signUpReqDto){
+        //중복 검사
+        validationDuplicateLoginId(signUpReqDto.getLoginId());
+        validationDuplicateUsername(signUpReqDto.getUsername());
 
+        //user 생성, 저장
+        Users user=createUserEntity(signUpReqDto);
+        Users saved=userRepository.save(user);
 
-    //2. login
-        //2-1 아이디/ 비번 검증
-        //2-2 AccessToken 발급(짧게)
-        //2-3 RefreshToken 발급(길게)
-        //2-4 RefreshToken을 db에 저장
+        //user_profile 생성, 저장
+        Profile profile=createProfileEntity(signUpReqDto, saved);
+        profileRepository.save(profile);
 
-    //3. logout
-        //3-1 db에서 refreshToken 삭제
-        //3-2 access는 만료될때까지 유효
+        return saved;
+    }
 
-    //4. refresh: 재발급
-        //4-1 db에서 현재 유효한 refresh 인지 확인
-        //4-2 새로운 access 발급
-        //4-3refresh rotation(새 retresh도 발급하고 기존 refresh 폐기)
+    //loginId 중복체크
+    private void validationDuplicateLoginId(String loginId){
+        if(userRepository.existsByLoginId(loginId)){
+            log.warn("중복된 loginId입니다. {}", loginId);
+            throw new IllegalArgumentException("이미 사용중인 아이디입니다.");
+        }
+    }
 
-    //5. 닉네임 중복 체크
+    //username 중복 체크
+    private void validationDuplicateUsername(String username){
+        if(userRepository.existsByUsername(username)){
+            log.warn("중복된 아이디 입니다: {}", username);
+            throw new IllegalArgumentException("이미 사용중인 이름입니다.");
+        }
+    }
+
+    // users 정보 저장: user entity 생성(비밀번호 암호화 적용)
+    private Users createUserEntity(SignupReqDto signupReqDto){
+
+        Role mainRole=roleRepository.findByRoleId(signupReqDto.getMainRoleId())
+                .orElseThrow((()-> new IllegalArgumentException("존재하지 않는 roleId.")));
+
+        return Users.builder()
+                .loginId(signupReqDto.getLoginId())
+                .username(signupReqDto.getUsername())
+                .password(bCryptPasswordEncoder.encode(signupReqDto.getPassword()))
+                .mainRoleId(mainRole)
+                .personality(signupReqDto.getPersonality())
+                .jwtRole(JwtRole.USER) //기본값은 USER
+                .build();
+    }
+
+    //profile 정보 저장
+    private Profile createProfileEntity(SignupReqDto signupReqDto, Users user){
+        return Profile.builder()
+                .user(user)
+                .email(signupReqDto.getEmail())
+                .birthYear(signupReqDto.getBirthYear())
+                .universityId(signupReqDto.getUniversityId())
+                .major(signupReqDto.getMajor())
+                .gender(signupReqDto.getGender())
+                .entranceYear(signupReqDto.getEntranceYear())
+                .status(signupReqDto.getStatus())
+                .build();
+    }
+
+    //logout
+    @Transactional
+    public void logout(HttpServletRequest req, HttpServletResponse res){
+        //쿠키에서 refresh token을 꺼내기
+        String refreshToken=CookieUtil.getCookieValue(req, CookieUtil.REFRESH_COOKIE_NAME)
+                .orElse(null);
+
+        //db에서 refresh token 삭제
+        if(refreshToken!=null && !refreshToken.isBlank()){
+            refreshTokenRepository.deleteByToken(refreshToken);
+        }
+
+        //refresh 쿠키 삭제
+        CookieUtil.clearRefreshCookie(res);
+
+    }
 }
