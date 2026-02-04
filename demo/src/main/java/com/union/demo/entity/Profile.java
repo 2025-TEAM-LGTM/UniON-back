@@ -3,33 +3,27 @@ package com.union.demo.entity;
 import com.union.demo.enums.Gender;
 import com.union.demo.enums.Status;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
 @Entity
+@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name="user_profile")
 public class Profile {
     @Id
-    @JoinColumn(name="user_id")
-    private Long userId;
+    private Long userId; //pk + fk
 
-    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
     @JoinColumn(name="user_id")
-    private User user;
-
-    @JoinColumn(name="birth_year")
-    private int birthYear;
+    private Users user;
 
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="university_id")
-    private University university;
+    @Column(name="university_id")
+    private Integer universityId;
 
     private String major;
 
@@ -38,6 +32,12 @@ public class Profile {
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    private int entrance_year;
+
+    @Column(name="entrance_year")
+    private Integer entranceYear;
+
+    @Column(name="birth_year")
+    private Integer birthYear;
+
 
 }

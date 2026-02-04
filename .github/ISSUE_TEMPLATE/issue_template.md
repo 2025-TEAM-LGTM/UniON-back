@@ -18,6 +18,6 @@ assignees: ''
 - [ ] 작업 1
 * [ ] 작업 2
 
-## Additional Context
+## 📑Additional Context
 
-* 📑기타 사항
+* 기타 사항
