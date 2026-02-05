@@ -115,7 +115,10 @@ public class SecurityConfig {
                                 "/api/members",
                                 "/api/posts",
                                 "/api/auth/signup",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll() //누구나 접근 가능
                         .anyRequest().authenticated())//그 이외의 요청은 인증된 사용자만 접근이 가능
 

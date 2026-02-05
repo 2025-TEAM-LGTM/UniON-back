@@ -74,7 +74,6 @@ public class AuthService {
                 .username(signupReqDto.getUsername())
                 .password(bCryptPasswordEncoder.encode(signupReqDto.getPassword()))
                 .mainRoleId(mainRole)
-                .personality(signupReqDto.getPersonality())
                 .jwtRole(JwtRole.USER) //기본값은 USER
                 .build();
     }

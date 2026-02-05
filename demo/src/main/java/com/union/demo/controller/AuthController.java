@@ -11,12 +11,14 @@ import com.union.demo.repository.UserRepository;
 import com.union.demo.service.AuthService;
 import com.union.demo.service.RefreshTokenService;
 import com.union.demo.utill.CookieUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.Map;
 
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -63,7 +66,8 @@ public class AuthController {
     }
 
     //2. 로그인 "/api/auth/login"
-    @PostMapping("/login")
+
+    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity <ApiResponse<LoginResDto>> login(@RequestBody @Valid LoginReqDto loginReqDto){
         //아이디 비번 검증
         authenticationManager.authenticate(
