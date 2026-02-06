@@ -25,10 +25,11 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        log.info("jwtfilter {} {}",req.getMethod(), req.getRequestURI());
+        //log.info("jwtfilter {} {}",req.getMethod(), req.getRequestURI());
 
         String authorization= req.getHeader("Authorization");
         String path=req.getRequestURI();
+
 
         //로그인/회원가입은 jwt 검사를 스킵
         if (path.equals("/api/auth/login") || path.equals("/api/auth/signup")) {

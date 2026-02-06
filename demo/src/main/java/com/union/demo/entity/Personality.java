@@ -18,7 +18,9 @@ public class Personality { //엔티티 아님, personality 클래스
     private int G;
     private int H;
     private int I;
-    private int J; private int K;
-    private int L; private int M;
+    private int J;
+    private int K;
+    private int L;
+    private int M;
     private int N;
 }
