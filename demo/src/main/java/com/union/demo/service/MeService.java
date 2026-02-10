@@ -1,6 +1,6 @@
 package com.union.demo.service;
 
-public class UserService {
+public class MeService {
     //1. getProfile 프로필 조회
 
     //2. updateProfile 프로필 수정

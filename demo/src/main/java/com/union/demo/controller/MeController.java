@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
+public class MeController {
 
     //[1. 프로필]
     //1.1 프로필 정보 가져오기 /api/users/profile

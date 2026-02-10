@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse body=ApiErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .code("SERVER_500")
-                .message("서버 오류가 발생했습니다.")
+                .message("서버 오류가 발생했습니다."+e.getMessage())
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
