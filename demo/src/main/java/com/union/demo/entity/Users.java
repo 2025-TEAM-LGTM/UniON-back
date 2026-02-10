@@ -7,6 +7,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -44,6 +46,9 @@ public class Users extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(name="jwt_role", nullable = false)
     private JwtRole jwtRole;
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<UserSkill> userSkills=new ArrayList<>();
 
     public String getHasRole(){
         return "ROLE_"+jwtRole.name();
