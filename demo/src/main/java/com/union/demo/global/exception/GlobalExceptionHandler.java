@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse body= ApiErrorResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .code("AUTH_401")
-                .message("로그인이 필요합니다.")
+                .message("로그인 필요합니다.")
                 .build();
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
@@ -63,12 +63,12 @@ public class GlobalExceptionHandler {
     }
 
     //403: 권한 없음: 로그인은 되어있지만 이 리소스를 쓸 권한이 없음 ex. 본인 글이 아닌데 삭제 시도
-    @ExceptionHandler(AccessException.class)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDeniedException(AccessDeniedException e){
         ApiErrorResponse body=ApiErrorResponse.builder()
                 .status(HttpStatus.FORBIDDEN.value())
                 .code("AUTH_403")
-                .message("접근 권한이 없습니다.")
+                .message(e.getMessage())
                 .build();
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);

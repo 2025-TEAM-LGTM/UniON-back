@@ -30,5 +30,9 @@ public class Image {
     @Column(name="size_type")
     private SizeType sizeType;
 
+    public void updateImageUrl(String imageUrl){
+        this.imageUrl=imageUrl;
+    }
+
 
 }

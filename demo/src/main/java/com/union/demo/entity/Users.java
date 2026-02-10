@@ -26,6 +26,10 @@ public class Users extends BaseEntity{
     @Column(nullable = false, length =255)
     private String password;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="image_id")
+    private Image image;
+
     @Column(nullable = false, length =50)
     private String username;
 

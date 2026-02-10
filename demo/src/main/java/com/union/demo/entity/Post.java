@@ -46,5 +46,16 @@ public class Post extends BaseEntity{
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostRecruitRole> recruitRoles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<PostCurrentRole> currentRoles= new ArrayList<>();
+
+    public void updateTitle(String title){this.title=title;}
+    public void updatePrimeDomainId(Domain prime){
+        this.primeDomainId=prime;
+    }
+
+    public void updateSecondDomainId(Domain second){
+        this.secondDomainId=second;
+    }
 
 }

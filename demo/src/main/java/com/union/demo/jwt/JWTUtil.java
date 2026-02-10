@@ -39,7 +39,7 @@ public class JWTUtil {
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("category",category)
-                .claim("loginId",loginId)
+                .claim("userId",userId)
                 .claim("hasRole",hasRole)
                 .issuedAt(now)
                 .expiration(exp)

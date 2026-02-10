@@ -1,12 +1,13 @@
 package com.union.demo.controller;
 
 import com.union.demo.dto.request.PostCreateReqDto;
-import com.union.demo.dto.response.PostCreateResDto;
+import com.union.demo.dto.request.PostUpdateReqDto;
+import com.union.demo.dto.response.PostDetailResDto;
 import com.union.demo.dto.response.PostListResDto;
+import com.union.demo.dto.response.PostPageResDto;
 import com.union.demo.entity.Users;
 import com.union.demo.global.common.ApiResponse;
 import com.union.demo.repository.UserRepository;
-import com.union.demo.security.CustomUserDetails;
 import com.union.demo.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -38,20 +39,28 @@ public class PostController {
 
     //2. 공고 작성 기능 "/api/posts"
     @PostMapping
-    public ResponseEntity<PostCreateResDto> createPost(
-            @AuthenticationPrincipal String loginId,
+    public ResponseEntity<PostDetailResDto> createPost(
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid PostCreateReqDto req
             ){
-        Users leader=userRepository.findByLoginId(loginId)
+        Users leader=userRepository.findByUserId(userId)
                 .orElseThrow(()-> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
         Long leaderId=leader.getUserId();
 
-        PostCreateResDto res=postService.createPost(leaderId,req);
+        PostDetailResDto res=postService.createPost(leaderId,req);
         return ResponseEntity.ok(res);
     }
 
     //3. 공고 수정하기 "/api/posts/{postId}"
+    @PatchMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostDetailResDto>> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateReqDto req
+            ){
+        PostDetailResDto data= postService.updatePost(postId, req);
+        return ResponseEntity.ok(ApiResponse.ok(data));
 
+    }
 
     //4. 공고 삭제하기 "/api/posts/{postId}"
     @DeleteMapping("/{postId}")
@@ -61,12 +70,11 @@ public class PostController {
     }
 
     //5. 공고 상세 페이지 + 공고명 보기 "/api/posts/{postId}"
-
-
-
-
-
-
+    @GetMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostPageResDto>> getPostDetail(@PathVariable Long postId){
+        PostPageResDto data= postService.getPostDetail(postId);
+        return ResponseEntity.ok(ApiResponse.ok(data));
+    }
 
 }
 
