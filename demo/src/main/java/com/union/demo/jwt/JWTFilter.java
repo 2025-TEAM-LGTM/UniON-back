@@ -25,7 +25,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        //log.info("jwtfilter {} {}",req.getMethod(), req.getRequestURI());
 
         String authorization= req.getHeader("Authorization");
         String path=req.getRequestURI();
@@ -61,7 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             var authorities= List.of(new SimpleGrantedAuthority(hasRole));
             var authToken=new UsernamePasswordAuthenticationToken(
-                    loginId, null, authorities );
+                    userId, null, authorities );
 
             authToken.setDetails(userId);
 

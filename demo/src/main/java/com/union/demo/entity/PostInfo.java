@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.union.demo.entity.Image;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -62,5 +64,34 @@ public class PostInfo {
             foreignKey = @ForeignKey(name = "post_info_image_id_fkey")
     )
     private Image image;
+
+
+    public void updateHomePageUrl(String url){
+        this.homepageUrl=url;
+    }
+    public void updateContact(String contact){
+        this.contact=contact;
+    }
+    public void updateSeeking(String seeking){
+        this.seeking=seeking;
+    }
+    public void updateAboutUs(String aboutUs){
+        this.aboutUs=aboutUs;
+    }
+    public void updateRecruitSdate(OffsetDateTime start){
+        this.recruitSdate=start;
+    }
+    public void updateRecruitEdate(OffsetDateTime end){
+        this.recruitEdate=end;
+    }
+
+    //이미지 업데이트 함수 필요
+    public void updateImage(String imageUrl){
+        image.updateImageUrl(imageUrl);
+    }
+
+    public void updateTeamCulture(Map<TeamCultureKey, Integer> teamCulture){
+        this.teamCulture=teamCulture;
+    }
 
 }
