@@ -1,13 +1,14 @@
 package com.union.demo.repository;
 
 import com.union.demo.entity.Role;
+import com.union.demo.entity.Skill;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role,Long> {
-    Optional <Role> findByRoleId(long roleId);
+public interface SkillRepository extends JpaRepository <Skill,Integer> {
 
-    List<Role> findByFieldId(long fieldId);
+    List<Skill> findByField_FieldId(Integer fieldId);
+
 }
