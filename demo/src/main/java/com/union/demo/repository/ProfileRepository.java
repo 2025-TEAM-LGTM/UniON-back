@@ -9,7 +9,5 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     //userId로 프로필 조회
     Optional<Profile> findByUserId(Long usersId);
 
-    //프로필 존재 여부 확인
-    boolean existsByUser_UserId(Long userId);
 
 }

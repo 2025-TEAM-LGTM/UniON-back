@@ -1,32 +1,50 @@
 package com.union.demo.controller;
 
+import com.union.demo.dto.response.MyProfileResDto;
+import com.union.demo.dto.response.PostPageResDto;
+import com.union.demo.global.common.ApiResponse;
+import com.union.demo.service.MeService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequiredArgsConstructor
+@RequestMapping("/api/me")
 public class MeController {
+    private final MeService meService;
+
 
     //[1. 프로필]
-    //1.1 프로필 정보 가져오기 /api/users/profile
+    //1.1 프로필 정보 가져오기 /api/me/profile
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<MyProfileResDto>> getMyProfile(
+            @AuthenticationPrincipal Long userId
+    ){
+        MyProfileResDto data= meService.getMyProfile(userId);
+        return ResponseEntity.ok(ApiResponse.ok(data));
+    }
 
 
-    //1.2 프로필 정보 수정하기 /api/users/profile
+    //1.2 프로필 정보 수정하기 /api/me/profile
 
 
 
     //[2. 포트폴리오]
-    //2.1 포트폴리오 목록 가져오기 /api/users/portfolios
+    //2.1 포트폴리오 목록 가져오기 /api/me/portfolios
 
 
-    //2.2 포트폴리오 업로드하기 /api/users/portfolios/{portfolioId}
+    //2.2 포트폴리오 업로드하기 /api/me/portfolios/{portfolioId}
 
 
-    //2.3 포트폴리오 세부 페이지 /api/users/portfolios/{portfolioId}
+    //2.3 포트폴리오 세부 페이지 /api/me/portfolios/{portfolioId}
 
 
-    //2.4 포트폴리오 삭제하기 /api/users/portfolios/{portfolioId}
+    //2.4 포트폴리오 삭제하기 /api/me/portfolios/{portfolioId}
 
 
-    //2.5 포트폴리오 수정하기 /api/users/portfolios/{portfolioId}
+    //2.5 포트폴리오 수정하기 /api/me/portfolios/{portfolioId}
 }
