@@ -35,4 +35,5 @@ public class MemberController {
         }
 
     //2. 팀원 프로필 보기  /api/members/{memberId}
+
 }
