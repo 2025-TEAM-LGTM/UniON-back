@@ -21,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,16 +36,40 @@ public class PostService {
     private final PostCurrentRoleRepository postCurrentRoleRepository;
 
     private static final ZoneOffset KST=ZoneOffset.ofHours(9);
+    private final ApplicantRepository applicantRepository;
 
     //1. getAllPosts 전체 공고 목록 조회 * 공고 필터기능
-    public PostListResDto getAllPosts(List<Integer> domainIds, List<Integer> fieldIds, List<Integer> roleIds){
+    public PostListResDto getAllPosts(Long userId, List<Integer> domainIds, List<Integer> fieldIds, List<Integer> roleIds){
         //빈 리스트 처리
         domainIds=normalize(domainIds);
         fieldIds=normalize(fieldIds);
-        roleIds=normalize(domainIds);
+        roleIds=normalize(roleIds);
 
 
         var posts=postRepository.findAllWithInfoAndRecruitRoles( domainIds,  fieldIds,  roleIds);
+
+        //postIds 추출
+        List<Long> postIds=posts.stream()
+                .map(Post::getPostId)
+                .toList();
+
+        //nowCount: 현재 인원 수 추출
+        Map<Long, Integer> nowCountMap;
+        if(!postIds.isEmpty()){
+            var rows=postCurrentRoleRepository.findNowCountByPostIds(postIds);
+            nowCountMap=rows.stream().collect(Collectors.toMap(
+                    PostNowCountRow::getPostId,
+                    r -> r.getNowCount()==null?0:r.getNowCount()
+            ));
+        } else {
+            nowCountMap = new HashMap<>();
+        }
+
+        //내가 지원한 postId 추출
+        Set<Long> appliedSet=new HashSet<>();
+        if(userId!=null &&!postIds.isEmpty()){
+            appliedSet.addAll(applicantRepository.findAppliedPostIds(userId, postIds));
+        }
 
         var postDtos=posts.stream().map(p-> {
             //D-day 계산
@@ -63,15 +88,20 @@ public class PostService {
                     .toList();
 
             //domainIds 만들기
-            var domainIdList=toDomainIds(p);
+            var domainItemList=toDomainItems(p);
+
+            int nowCount=nowCountMap.getOrDefault(p.getPostId(),0);
+            boolean applied=(userId!=null )&& appliedSet.contains(p.getPostId());
 
             //postList 데이터들 빌드
             return PostListResDto.PostSummaryDto.builder()
                     .postId(p.getPostId())
                     .title(p.getTitle())
                     .dday(dday)
-                    .domainIds(domainIdList)
+                    .domains(domainItemList)
                     .recruits(recruits)
+                    .nowCount(nowCount)
+                    .applied(applied)
                     .build();
         }).toList();
 
@@ -79,26 +109,30 @@ public class PostService {
                 .posts(postDtos)
                 .build();
     }
+
     //빈 리스트면 null 처리
     private List<Integer> normalize(List<Integer> ids) {
         return (ids == null || ids.isEmpty()) ? null : ids;
     }
+
     //D-day 계산
     private int calcDday(OffsetDateTime recruitEdate){
         if(recruitEdate == null) return 0;
         return (int) ChronoUnit.DAYS.between(OffsetDateTime.now(), recruitEdate);
     }
 
-    //domainId 가져오기
-    private List<Integer> toDomainIds(Post post){
+    //domain ItemDto로 변환
+    private List<PostListResDto.ItemDto> toDomainItems(Post post){
         return java.util.stream.Stream.of(post.getPrimeDomainId(),post.getSecondDomainId())
-                .filter(java.util.Objects :: nonNull)
-                .map(Domain::getDomainId)
+                .filter(Objects::nonNull)
                 .distinct()
-                .toList();
+                .map(d-> PostListResDto.ItemDto.builder()
+                        .id(d.getDomainId())
+                        .name(d.getDomainName())
+                        .build()
+                ).toList();
+
     }
-
-
 
     //2. createPost 공고 작성
     @Transactional

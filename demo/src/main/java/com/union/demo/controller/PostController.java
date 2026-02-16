@@ -29,12 +29,13 @@ public class PostController {
     @Operation(summary = "전체 공고 목록 조회", description = "전체 목록 조회 + 쿼리를 통해 검색도 가능, 자세한 쿼리내용은 노션 api 문서 확인하기")
     @GetMapping
     public ResponseEntity<ApiResponse<PostListResDto>> getPosts(
+            @AuthenticationPrincipal Long userId,
             @RequestParam(required = false) List<Integer> domainIds,
             @RequestParam(required = false) List<Integer> fieldIds,
             @RequestParam(required = false) List<Integer> roleIds
 
     ){
-        PostListResDto data= postService.getAllPosts(domainIds, fieldIds, roleIds);
+        PostListResDto data= postService.getAllPosts(userId,domainIds, fieldIds, roleIds);
         return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
