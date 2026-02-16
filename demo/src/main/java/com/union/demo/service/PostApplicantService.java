@@ -62,6 +62,19 @@ public class PostApplicantService {
     }
 
     //2 공고 지원 취소하기
+    @Transactional
+    public ApplyResDto cancelApply(Long postId, Long userId){
+        Applicant applicant=applicantRepository.findByPost_postIdAndUser_UserId(postId, userId)
+                .orElseThrow(()-> new NoSuchElementException("지원 내역이 없습니다"));
+
+        ApplyResDto res=ApplyResDto.from(applicant);
+        applicantRepository.delete(applicant);
+        return res;
+
+    }
+
+
+
 
     //3. getApplicants  공고에 지원한 사람들 조회 + 필터링
 }

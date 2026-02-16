@@ -6,10 +6,7 @@ import com.union.demo.service.PostApplicantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +26,15 @@ public class PostApplicantController {
 
 
     //2 공고 지원 취소하기
+    @DeleteMapping("/{postId}/applications/me")
+    public ResponseEntity<ApiResponse<ApplyResDto>> cancelApply(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long postId
+    ){
+
+        ApplyResDto data= postApplicantService.cancelApply(postId, userId);
+        return ResponseEntity.ok(ApiResponse.ok(data));
+    }
 
 
     //3. 공고에 지원한 팀원 목록 필터 기능  /api/posts/{postId}/applicant?roleId=...&skillIds=1,2,3&p=
