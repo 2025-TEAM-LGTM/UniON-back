@@ -23,10 +23,21 @@ public class PostListResDto {
         private Long postId;
         private String title;
         private Integer dday;
-        private List<Integer> domainIds; //primeDomainId, secondDomainId
+        private List<ItemDto> domains; //primeDomainId, secondDomainId
         private List<RecruitDto> recruits;
+        //아래 두개 추가
+        private Integer nowCount; //현재 인원수
+        private boolean applied; //지원 여부
     }
 
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class ItemDto{
+        private Integer id;
+        private String name;
+    }
     @Getter
     @AllArgsConstructor
     @Builder
