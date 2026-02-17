@@ -21,4 +21,15 @@ public interface PostCurrentRoleRepository extends JpaRepository<PostCurrentRole
     where pcr.post.postId = :postId
 """)
     List<PostCurrentRole> findByPostIdWithCurrenRole(@Param("postId") Long postId);
+
+    //현재 총 몇명인지 세기
+    @Query("""
+    select pcr.post.postId as postId, sum(pcr.count) as nowCount
+    from PostCurrentRole pcr
+    where pcr.post.postId in :postIds
+    group by pcr.post.postId
+""")
+    List<PostNowCountRow> findNowCountByPostIds(@Param("postIds")List<Long> postIds);
+
+
 }
