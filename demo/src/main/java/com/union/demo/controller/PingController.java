@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+//fast api 연결이 잘 되는지 확인하는 controller
+//http://localhost:8080/test-python?postId=123
 @RestController
 public class PingController {
 

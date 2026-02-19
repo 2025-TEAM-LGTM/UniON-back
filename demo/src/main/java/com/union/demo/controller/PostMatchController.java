@@ -1,7 +1,11 @@
 package com.union.demo.controller;
 
+import com.union.demo.dto.response.MemberListResDto;
+import com.union.demo.dto.response.MemberMatchResDto;
 import com.union.demo.dto.response.PostMatchResDto;
+import com.union.demo.global.common.ApiResponse;
 import com.union.demo.service.PostMatchService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,7 +13,6 @@ import java.util.List;
 @RestController
 public class PostMatchController {
     //1. 공고에 핏한 팀원 목록 보기 "/api/posts/{postId}/matches"
-    //성향 일치 정보는 service에서 이루어짐
     private final PostMatchService postMatchService;
 
     public PostMatchController(PostMatchService postMatchService) {
@@ -17,8 +20,10 @@ public class PostMatchController {
     }
 
     @GetMapping("/api/posts/{postId}/matches")
-    public PostMatchResDto getPostMatch(@PathVariable Long postId){
-        return postMatchService.postMatchFastApi(postId);
+    public ResponseEntity<ApiResponse<MemberMatchResDto>> getPostMatch(@PathVariable Long postId){
+        MemberMatchResDto data=postMatchService.postMatchFastApi(postId);
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
 
