@@ -1,9 +1,6 @@
 package com.union.demo.service;
 
-import com.union.demo.dto.response.MemberListResDto;
-import com.union.demo.dto.response.PortfolioDetailResDto;
-import com.union.demo.dto.response.PortfolioListResDto;
-import com.union.demo.dto.response.ProfileResDto;
+import com.union.demo.dto.response.*;
 import com.union.demo.entity.*;
 import com.union.demo.enums.PersonalityKey;
 import com.union.demo.repository.*;
@@ -14,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Member;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,7 +106,62 @@ public class MemberService{
         return getMembersInternal(applicantUserIds, roleIds,hardSkillIds,personality);
     }
 
+    //공고 매칭 팀원 리스트 필터링
+    public MemberMatchResDto getMatchMembers(
+            List<Long> matchingUserIds,
+            Map<Long, String> strengthMap,
+            List<Integer> roleIds,
+            List<Integer> hardSkillIds,
+            Map<PersonalityKey, Integer> personality
+    ){
 
+        //추천 후보군 안에서만 필터링 로직
+        List<Users> users=memberRepository.searchMembers(matchingUserIds,roleIds,hardSkillIds,personality);
+
+        if(users.isEmpty()){
+            return MemberMatchResDto.builder()
+                    .members(Collections.emptyList())
+                    .build();
+        }
+
+        //userId
+        List<Long> usersIds=users.stream().map(Users::getUserId).toList();
+
+        //userSkill
+        List<UserSkill> userSkills= userSkillRepository.findAllByUserIdInWithSkill(usersIds);
+
+        //userId 기준으로 skills 그룹핑
+        Map<Long, List<MemberMatchResDto.ItemDto>> skillsByUserId=userSkills.stream()
+                .collect(Collectors.groupingBy(
+                        us-> us.getUser().getUserId(),
+                        Collectors.mapping(
+                                us-> MemberMatchResDto.ItemDto.builder()
+                                        .id(us.getSkill().getSkillId())
+                                        .name(us.getSkill().getSkillName())
+                                        .build(),
+                                Collectors.toList()
+                        )
+                ));
+
+        //fastAPI 추천 순서 유지
+        Map<Long, Users> userMap=users.stream()
+                .collect(Collectors.toMap(Users::getUserId, u->u));
+
+        //추천 순서대로 dto + mainStrength 구성
+        List<MemberMatchResDto.MemberMatchDto> memberDtos= matchingUserIds.stream()
+                .map(userMap::get)
+                .filter(Objects::nonNull)
+                .map(user -> MemberMatchResDto.from(
+                        user,
+                        skillsByUserId.getOrDefault(user.getUserId(),List.of()),
+                        strengthMap!=null ? strengthMap.get(user.getUserId()): null
+                ))
+                .toList();
+
+        return MemberMatchResDto.builder()
+                .members(memberDtos)
+                .build();
+    }
 
     // getMemberProfile 함수
     public ProfileResDto getMemberProfile(Long memberId){

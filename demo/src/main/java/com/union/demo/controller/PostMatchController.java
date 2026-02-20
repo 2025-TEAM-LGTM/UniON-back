@@ -1,15 +1,21 @@
 package com.union.demo.controller;
 
+import com.union.demo.dto.response.MemberListResDto;
+import com.union.demo.dto.response.MemberMatchResDto;
 import com.union.demo.dto.response.PostMatchResDto;
+import com.union.demo.enums.PersonalityKey;
+import com.union.demo.global.common.ApiResponse;
 import com.union.demo.service.PostMatchService;
+import com.union.demo.utill.PersonalityParserUtil;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class PostMatchController {
-    //1. 공고에 핏한 팀원 목록 보기 "/api/posts/{postId}/matches"
-    //성향 일치 정보는 service에서 이루어짐
+    // 공고에 핏한 팀원 목록 조회 및 필터링 "/api/posts/{postId}/matches"
     private final PostMatchService postMatchService;
 
     public PostMatchController(PostMatchService postMatchService) {
@@ -17,13 +23,19 @@ public class PostMatchController {
     }
 
     @GetMapping("/api/posts/{postId}/matches")
-    public PostMatchResDto getPostMatch(@PathVariable Long postId){
-        return postMatchService.postMatchFastApi(postId);
+    public ResponseEntity<ApiResponse<MemberMatchResDto>> getPostMatch(
+            @PathVariable Long postId,
+            @RequestParam(required = false, name="r") List<Integer> roleIds,
+            @RequestParam(required = false, name="hs") List<Integer> hardSkillIds,
+            @RequestParam(required = false, name="p") String personality
+
+    ){
+        Map<PersonalityKey, Integer> personalityFilter= PersonalityParserUtil.parse(personality);
+        MemberMatchResDto data=postMatchService.postMatchFastApi(postId,roleIds,hardSkillIds, personalityFilter);
+
+        return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
-
-    //2. 공고에 핏한 팀원 필터기능 "/api/posts/123/matches?roleId=...&skillIds=1,2,3&p= "
-    // @GetMapping(".api/posts/{postId}/matches?role=Id")
 
 
 }

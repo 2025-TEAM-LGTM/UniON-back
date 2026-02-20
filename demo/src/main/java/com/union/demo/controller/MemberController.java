@@ -24,9 +24,9 @@ public class MemberController {
     //1. 전체 팀원 목록 조회 + 필터링 /api/members?r=105&r=103&hs=121&p=D,E
     @GetMapping
     public ResponseEntity<ApiResponse<MemberListResDto>> getMembers(
-            @RequestParam(required = false, name="r") List<Integer> roleIds,
-            @RequestParam(required = false, name="hs") List<Integer> hardSkillIds,
-            @RequestParam(required = false, name="p") String personality
+            @RequestParam(required = false, name = "r") List<Integer> roleIds,
+            @RequestParam(required = false, name = "hs") List<Integer> hardSkillIds,
+            @RequestParam(required = false, name = "p") String personality
             ){
         Map<PersonalityKey, Integer> personalityFilter = PersonalityParserUtil.parse(personality);
         MemberListResDto data=memberService.getMembers(roleIds, hardSkillIds, personalityFilter);
