@@ -41,7 +41,7 @@ public class MemberMatchResDto {
         private String name;
     }
 
-    public static MemberMatchDto from(Users user, String mainStrength){
+    public static MemberMatchDto from(Users user, List<ItemDto> skills, String mainStrength){
         Role r=user.getMainRoleId();
 
         return MemberMatchDto.builder()
@@ -52,12 +52,7 @@ public class MemberMatchResDto {
                         .id(r.getRoleId())
                         .name(r.getRoleName())
                         .build())
-                .hardSkill(user.getUserSkills().stream()
-                        .map(us-> ItemDto.builder()
-                                .id(us.getSkill().getSkillId())
-                                .name(us.getSkill().getSkillName())
-                                .build())
-                        .toList())
+                .hardSkill(skills != null ? skills : List.of())
                 .personality(user.getPersonality())
                 .mainStrength(mainStrength)
                 .build();

@@ -1,6 +1,7 @@
 package com.union.demo.repository;
 
 import com.union.demo.entity.UserSkill;
+import com.union.demo.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,5 @@ where u.userId in :userIds
     @Query("delete from UserSkill us where us.user.userId = :userId")
     void deleteByUser_UserId(Long userId);
 
+    List<Long> user(Users user);
 }
