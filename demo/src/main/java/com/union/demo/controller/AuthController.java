@@ -12,6 +12,7 @@ import com.union.demo.repository.UserRepository;
 import com.union.demo.service.AuthService;
 import com.union.demo.service.RefreshTokenService;
 import com.union.demo.utill.CookieUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.Map;
 
-@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
