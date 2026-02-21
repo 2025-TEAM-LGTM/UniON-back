@@ -16,22 +16,27 @@ public class Image {
     @Column(name="image_id")
     private Long imageId;
 
-    @Column(name="image_url")
-    private String imageUrl;
+    @Column(name="s3_key", length = 255)
+    private String s3Key;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="purpose")
+    @Column(name="purpose", length = 255)
     private Purpose purpose;
 
     @Column(name="file_size")
     private Long fileSize;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="size_type")
+    @Column(name="size_type", length = 255)
     private SizeType sizeType;
 
-    public void updateImageUrl(String imageUrl){
-        this.imageUrl=imageUrl;
+    public static Image of(String s3Key, Purpose purpose, Long fileSize, SizeType sizeType){
+        Image image=new Image();
+        image.s3Key=s3Key;
+        image.purpose=purpose;
+        image.fileSize=fileSize;
+        image.sizeType=sizeType;
+        return image;
     }
 
 
