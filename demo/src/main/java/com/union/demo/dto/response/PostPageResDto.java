@@ -4,6 +4,7 @@ import com.union.demo.entity.Post;
 import com.union.demo.entity.PostCurrentRole;
 import com.union.demo.entity.PostInfo;
 import com.union.demo.enums.TeamCultureKey;
+import com.union.demo.utill.S3UrlResolver;
 import lombok.*;
 
 import javax.swing.text.html.Option;
@@ -62,7 +63,10 @@ public class PostPageResDto {
         private Integer count;
     }
 
-    public static PostPageResDto from(Post post, List<PostCurrentRole> postCurrentRoles){
+    public static PostPageResDto from(Post post,
+                                      List<PostCurrentRole> postCurrentRoles,
+                                      S3UrlResolver s3UrlResolver){
+
         return PostPageResDto.builder()
                 .postId(post.getPostId())
                 .leader(
@@ -70,7 +74,7 @@ public class PostPageResDto {
                                 .userId(post.getLeaderId().getUserId())
                                 .username(post.getLeaderId().getUsername())
                                 .userImageUrl(post.getLeaderId().getImage() !=null ?
-                                        post.getLeaderId().getImage().getImageUrl():null)
+                                        s3UrlResolver.toUrl(post.getLeaderId().getImage().getS3Key()):null)
                                 .build()
                 )
                 .title(post.getTitle())
@@ -113,7 +117,8 @@ public class PostPageResDto {
                 .imageUrl(
                         Optional.ofNullable(post.getPostInfo())
                                 .map(PostInfo::getImage)
-                                .map(Image::getImageUrl)
+                                .map(Image::getS3Key)
+                                .map(s3UrlResolver::toUrl)
                                 .orElse(null)
                 )
                 .build();

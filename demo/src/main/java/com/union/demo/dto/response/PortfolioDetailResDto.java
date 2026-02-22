@@ -4,6 +4,7 @@ import com.union.demo.entity.Domain;
 import com.union.demo.entity.Image;
 import com.union.demo.entity.Portfolio;
 import com.union.demo.entity.Role;
+import com.union.demo.utill.S3UrlResolver;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class PortfolioDetailResDto {
         private String name;
     }
 
-    public static PortfolioDetailResDto from(Portfolio portfolio){
+    public static PortfolioDetailResDto from(Portfolio portfolio, S3UrlResolver s3UrlResolver){
         Domain d= portfolio.getDomain();
         Role r= portfolio.getRole();
         Image i=portfolio.getImage();
@@ -57,7 +58,7 @@ public class PortfolioDetailResDto {
                 .Ttext(portfolio.getTtext())
                 .Atext(portfolio.getAtext())
                 .Rtext(portfolio.getRtext())
-                .imageUrl(i!=null?i.getImageUrl():null)
+                .imageUrl(i!=null?s3UrlResolver.toUrl(i.getS3Key()):null)
                 .build();
 
     }
