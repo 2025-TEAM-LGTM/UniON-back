@@ -86,8 +86,8 @@ public class PostInfo {
     }
 
     //이미지 업데이트 함수 필요
-    public void updateImage(String imageUrl){
-        image.updateImageUrl(imageUrl);
+    public void updateImage(Image image){
+        this.image=image;
     }
 
     public void updateTeamCulture(Map<TeamCultureKey, Integer> teamCulture){

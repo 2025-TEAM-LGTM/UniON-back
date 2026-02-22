@@ -6,9 +6,11 @@ import com.union.demo.dto.response.PostDetailResDto;
 import com.union.demo.dto.response.PostListResDto;
 import com.union.demo.dto.response.PostPageResDto;
 import com.union.demo.entity.*;
+import com.union.demo.enums.Purpose;
 import com.union.demo.enums.RecruitStatus;
 import com.union.demo.enums.TeamCultureKey;
 import com.union.demo.repository.*;
+import com.union.demo.utill.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -34,9 +36,11 @@ public class PostService {
     private final DomainRepository domainRepository;
     private final PostRecruitRoleRepository postRecruitRoleRepository;
     private final PostCurrentRoleRepository postCurrentRoleRepository;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final ZoneOffset KST=ZoneOffset.ofHours(9);
     private final ApplicantRepository applicantRepository;
+    private final ImageRepository imageRepository;
 
     //1. getAllPosts 전체 공고 목록 조회 * 공고 필터기능
     public PostListResDto getAllPosts(Long userId, List<Integer> domainIds, List<Integer> fieldIds, List<Integer> roleIds){
@@ -182,6 +186,15 @@ public class PostService {
 
         //일단 image는 아직 개발이 안되서 null 처리 할게요
         Image image=null;
+        if(req.getImageKey()!=null && !req.getImageKey().isBlank()){
+            image=imageRepository.save(
+                    Image.builder()
+                            .s3Key(req.getImageKey())
+                            .fileSize(req.getImageSize())
+                            .purpose(Purpose.POST)
+                            .build()
+            );
+        }
 
         //teamCulture를 jsonb로 변환하기
         Map<TeamCultureKey, Integer> teamCulture=null;
@@ -241,7 +254,7 @@ public class PostService {
         postCurrentRoleRepository.saveAll(currentRoleEntities);
 
         //recruitRole 저장
-        List<PostCreateReqDto.RoleCountDto> recruitRoles=Optional.ofNullable(req.getCurrentRoles())
+        List<PostCreateReqDto.RoleCountDto> recruitRoles=Optional.ofNullable(req.getRecruitRoles())
                 .orElseThrow(()-> new IllegalArgumentException("recruitRoles 찾을 수 없습니다."));
 
         if(recruitRoles.isEmpty()){
@@ -301,7 +314,32 @@ public class PostService {
         if(req.getSeeking()!=null) postInfo.updateSeeking(req.getSeeking());
         if(req.getAboutUs()!=null) postInfo.updateAboutUs(req.getAboutUs());
         if(req.getContact()!=null) postInfo.updateContact(req.getContact());
-        if(req.getImageUrl()!=null) postInfo.updateImage(req.getImageUrl());
+
+        //image
+        if(req.getImageKey()!=null) {
+            String newKey=req.getImageKey().isBlank()?null:req.getImageKey();
+
+            Image oldImage=postInfo.getImage();
+
+            if(newKey==null){
+                postInfo.updateImage(null);
+            }
+            else{
+                if(oldImage==null){
+                    Image newImage=imageRepository.save(
+                            Image.builder()
+                                    .s3Key(newKey)
+                                    .fileSize(req.getImageSize())
+                                    .purpose(Purpose.POST)
+                                    .build()
+                    );
+                    postInfo.updateImage(newImage);
+                }else{
+                    oldImage.updateS3Key(newKey);
+                    oldImage.updateFileSize(req.getImageSize());
+                }
+            }
+        }
 
         //recruitPeriod update
         if(req.getRecruitPeriod()!=null){
@@ -416,8 +454,10 @@ public class PostService {
     public PostPageResDto getPostDetail(Long postId){
         Post post=postRepository.findPostDetailWithRecruitRolesById(postId)
                 .orElseThrow(()-> new NoSuchElementException(postId+ " 해당 공고가 존재하지 않습니다."));
+
         List<PostCurrentRole> currentRoles= postCurrentRoleRepository.findByPostIdWithCurrenRole(postId);
-        return PostPageResDto.from(post, currentRoles);
+
+        return PostPageResDto.from(post, currentRoles,s3UrlResolver);
     }
 
 

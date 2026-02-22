@@ -51,7 +51,8 @@ public class PostUpdateReqDto {
             """)
     private Map<String, Integer> teamCulture;
 
-    private String imageUrl;
+    private String imageKey;
+    private Long imageSize;
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
