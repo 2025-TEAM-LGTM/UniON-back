@@ -20,7 +20,9 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String createPresignedUrl(String contentType){
+    public record PresignResult(String key, String presignedUrl){};
+
+    public PresignResult createPresignedUrl(String contentType){
         String key="uploads/"+ UUID.randomUUID();
 
         PutObjectRequest  putObjectRequest= PutObjectRequest.builder()
@@ -34,10 +36,9 @@ public class S3Uploader {
                 .putObjectRequest(putObjectRequest)
                 .build();
 
-        return presigner
-                .presignPutObject(presignRequest)
-                .url().toString();
+        String url=presigner.presignPutObject(presignRequest).url().toString();
 
+        return new PresignResult(key, url);
     }
 
 
